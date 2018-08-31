@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# feature: extract all hidden files which suffixed by ".mp4" into a directory(resultDir) recursively.
+# focus: user's targetDir must exist before user start this script, user's targetDir should be empty as well.
+# author: huh.
+
+pcount=$#
+if (( pcount<2  )) ; then
+	echo "error: two parameters required!"
+	echo "usage: $./find_vedio.sh dir1 dir2"
+	exit;
+fi
+
+sourceDir=$1
+resultDir=$2
+
+# find all mp4 files, save the absolute path in '/tmp/map'
+function getAbsPath(){
+	#echo $sourceDir
+	find $sourceDir | grep .mp4 > /tmp/mp4
+	echo '/tmp/mp4'
+}
+
+# get the number of the mp4 files.
+function getFileNums(){
+	recordFile=`getAbsPath`
+	files=`wc -l $recordFile`
+	files=${files% *}
+	echo $files
+}
+
+# extract file into user offered 'targerDir' form 'sourceDir' recursively.
+function readRecord(){
+	echo "start extracting file ..."
+	files=`getFileNums`
+	recordFile=`getAbsPath`
+	i=1
+	while ([ $i -le $files ]) ; do
+		filePath=`sed -n ${i}p ${recordFile}`
+		filePathWithoutSpace=`echo $filePath | sed s/[[:space:]]//g`
+
+		fileNameWithSpace=`basename "$filePath"`
+		fileNameWithOutSpace=`basename $filePathWithoutSpace`
+		fileNameWithOutSpace=`echo $fileNameWithOutSpace | sed '1s/^.//'`
+
+		#echo "$fileNameWithSpace"
+		#echo "$fileNameWithOutSpace"
+		cp "$filePath" $resultDir || echo "extract failed: $fileNameWithOutSpace" && echo "extract successed: $fileNameWithOutSpace"
+		mv $resultDir/"$fileNameWithSpace" $resultDir/"$fileNameWithOutSpace"
+		((i++))
+	done
+	rm -rf $recordFile
+	echo "file extract finished"
+}
+
+# the entrance of this script.
+readRecord
+
+
