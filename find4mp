@@ -43,10 +43,19 @@ function readRecord(){
 		fileNameWithOutSpace=`basename $filePathWithoutSpace`
 		fileNameWithOutSpace=`echo $fileNameWithOutSpace | sed '1s/^.//'`
 
-		#echo "$fileNameWithSpace"
-		#echo "$fileNameWithOutSpace"
-		cp "$filePath" $resultDir || echo "extract failed: $fileNameWithOutSpace" && echo "extract successed: $fileNameWithOutSpace"
-		mv $resultDir/"$fileNameWithSpace" $resultDir/"$fileNameWithOutSpace"
+		parentDir=`dirname $filePathWithoutSpace`
+		preDir=`basename $parentDir`
+
+		prepreDir=`dirname $parentDir`
+		belongType=`basename $prepreDir`
+		
+		desDir=$resultDir$belongType/$preDir
+		if [ ! -d $desDir ]; then
+			mkdir -p $desDir
+		fi
+
+		cp "$filePath" $desDir || echo "extract failed: $fileNameWithOutSpace" && echo "extract successed: $fileNameWithOutSpace"
+		mv $desDir/"$fileNameWithSpace" $desDir/"$fileNameWithOutSpace"
 		((i++))
 	done
 	rm -rf $recordFile
