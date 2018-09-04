@@ -1,0 +1,12 @@
+#!/bin/bash
+pcount=$#  # 表示返回所有脚本参数的个数
+hostnamePrefix=huh-
+if (( pcount<1  )) ; then
+	echo no args;
+	exit;
+fi
+
+for (( host=1 ; host<4 ; host=host+1 )) ; do
+	echo ------------$hostnamePrefix$host----------------
+	ssh $hostnamePrefix$host $@
+done

@@ -1,0 +1,17 @@
+#!/bin/bash
+pcount=$#
+hostnamePref=huh-
+if (( pcount<1  )) ; then
+	echo no args;
+	exit;
+fi
+
+p1=$1;
+fname=`basename $p1`
+pdir=`cd -P $(dirname $p1) ; pwd`
+cuser=`whoami`
+
+for (( host=1 ; host<4 ; host=host+1 )) ; do
+	echo ------------$hostnamePref$host----------------
+	rsync -rvl $pdir/$fname $cuser@$hostnamePref$host:$pdir
+done
